@@ -27,10 +27,13 @@ convertToExp (x : xs)
 wordSplit :: String -> Polynom
 wordSplit str = [Termo (convertToExp (signal : takeWhile isDigit uterm)) (takeWhile isAlpha (dropWhile (\chr -> isDigit chr || chr == '*') uterm)) (convertToExp (dropWhile (const False) (drop idx uterm))) | idx_term <- [0 .. length (words str) -1], let uterm = words str Prelude.!! idx_term; idx = if Data.Maybe.isJust (elemIndex '^' uterm) then fromJust (elemIndex '^' uterm) + 1 else 0; signal = if idx_term > 0 && head (words str Prelude.!! (idx_term -1)) == '-' then '-' else '+', uterm /= "+" && uterm /= "-"]
 
-sumPolynom :: Polynom -> Polynom
-sumPolynom [] = []
-sumPolynom [p] = [p]
-sumPolynom (p1 : p2 : ps) = Termo (coef p1 + coef p2) (variable p1) (expo p1) : sumPolynom ps
+sumMatchingPolynoms :: Polynom -> Polynom
+sumMatchingPolynoms [] = []
+sumMatchingPolynoms [p] = [p]
+sumMatchingPolynoms (p1 : p2 : ps) = Termo (coef p1 + coef p2) (variable p1) (expo p1) : sumMatchingPolynoms ps
+
+sumPolynoms :: Polynom -> Polynom
+sumPolynoms p = concatMap sumMatchingPolynoms (grouping p)
 
 {-findMatchingTerm :: Termo -> Polynom -> Int
 findMatchingTerm _ [] = -1
