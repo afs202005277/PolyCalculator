@@ -3,10 +3,11 @@
 import Data.Char
 import Data.List
 import Data.Maybe (fromJust, isJust)
+import Text.Read (readMaybe)
 
 type Polynom = [Termo]
 
-data Termo = Termo {coef :: Int, variable :: String, expo :: Int} deriving Eq
+data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq, Show)
 
 {-instance Termo where
   show (c:v:e) = show (coef t) ++ "*" ++ variable t ++ "^" ++ show (expo t)-}
@@ -37,8 +38,18 @@ convertToExp (x : xs)
   | all isDigit (x : xs) = read (x : xs) :: Int
   | otherwise = 1
 
+findExponents :: String -> [Int]
+findExponents [] = []
+findExponents [a] = [1]
+findExponents (x:y:xs)
+            | isAlpha x && isDigit y = (read (takeWhile isDigit (y:xs)) :: Int) : findExponents xs
+            | otherwise = 1 : findExponents (y:xs)
+
+termoFactory :: String -> Termo
+termoFactory str = Termo (if isJust (readMaybe (takeWhile (\x -> (not . isAlpha) x && x /= '*') str) :: Maybe Float ) then fromJust (readMaybe (takeWhile (\x -> (not . isAlpha) x && x /= '*') str)) else 1) (filter isAlpha str) (findExponents (filter (\x -> isAlpha x || isDigit x) (dropWhile (\x -> (not . isAlpha) x && x /= '*') str)))
+
 wordSplit :: String -> Polynom
-wordSplit str = [Termo (convertToExp (signal : takeWhile isDigit uterm)) (takeWhile isAlpha (dropWhile (\chr -> isDigit chr || chr == '*') uterm)) (convertToExp (dropWhile (const False) (drop idx uterm))) | idx_term <- [0 .. length (words str) -1], let uterm = words str Prelude.!! idx_term; idx = if Data.Maybe.isJust (elemIndex '^' uterm) then fromJust (elemIndex '^' uterm) + 1 else 0; signal = if idx_term > 0 && head (words str Prelude.!! (idx_term -1)) == '-' then '-' else '+', uterm /= "+" && uterm /= "-"]
+wordSplit str = [termoFactory (if signal == '+' then uterm else signal : uterm) | idx_term <- [0 .. length (words str) -1], let uterm = words str Prelude.!! idx_term; idx = if Data.Maybe.isJust (elemIndex '^' uterm) then fromJust (elemIndex '^' uterm) + 1 else 0; signal = if idx_term > 0 && head (words str Prelude.!! (idx_term -1)) == '-' then '-' else '+', uterm /= "+" && uterm /= "-"]
 
 sumMatchingPolynoms :: Polynom -> Polynom
 sumMatchingPolynoms [] = []
@@ -48,31 +59,3 @@ sumMatchingPolynoms (p1 : p2 : ps) = Termo (coef p1 + coef p2) (variable p1) (ex
 sumPolynoms :: Polynom -> Polynom
 sumPolynoms p = concatMap sumMatchingPolynoms (grouping p)
 
-{-findMatchingTerm :: Termo -> Polynom -> Int
-findMatchingTerm _ [] = -1
-findMatchingTerm needle (p:ps)
-                    | coef p == coef needle && variable p == variable needle = 0
-                    | otherwise = 1 + findMatchingTerm needle (p:ps)-}
-
-{- addTerms :: Polynom -> Polynom
-addTerms [] = []
-addTerms (p:ps)
-            | Data.Maybe.isJust possibleIdx= addTerms (sumToIndex(coef p) (fromJust possibleIdx) 0 ps)
-            | otherwise = p : addTerms ps
-            where lista = [variable tmp | tmp <- p:ps]
-                  possibleIdx = elemIndex (head lista) (tail lista)-}
-
-{-
-sumToIndex :: Int -> Int -> Int -> Polynom -> Polynom
-sumToIndex _ _ _ [] = error "EMPTY POLYNOM"
-sumToIndex element idx currentIdx (p:ps)
-                          | idx == currentIdx = Termo (coef p + element) (variable p) (expo p) : ps
-                          | otherwise = p : sumToIndex element idx (currentIdx+1) ps
-
--}
-
-{-
-stringToInternal :: [Termo] -> IO ()
-stringToInternal = do putStr "Polinómio?"
-                      str <- getLine
-                      -}
