@@ -6,7 +6,20 @@ import Data.Maybe (fromJust, isJust)
 
 type Polynom = [Termo]
 
-data Termo = Termo {coef :: Int, variable :: String, expo :: Int} deriving (Eq, Show)
+data Termo = Termo {coef :: Int, variable :: String, expo :: Int} deriving Eq
+
+{-instance Termo where
+  show (c:v:e) = show (coef t) ++ "*" ++ variable t ++ "^" ++ show (expo t)-}
+
+instance Ord Termo where
+  compare t1 t2
+          | variable t1 < variable t2 = LT
+          | variable t1 == variable t2 && expo t1 < expo t2 = GT
+          | variable t1 == variable t2 && expo t1 == expo t2 = EQ
+          | otherwise = GT
+
+normalize :: Polynom -> Polynom
+normalize p = sort (filter (\x -> coef x /= 0) (sumPolynoms p))
 
 isEqual :: Termo -> Termo -> Bool
 isEqual t1 t2 = variable t1 == variable t2 && expo t1 == expo t2
