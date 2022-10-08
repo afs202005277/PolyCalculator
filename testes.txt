@@ -1,3 +1,5 @@
 sumPolynoms [Termo 0 "x" [2], Termo 2 "y" [1], Termo 5.1 "z" [1], Termo 1 "y" [1], Termo 7 "y" [2]]
 
 normalize  [Termo 0 "x" [2], Termo 2 "y" [1], Termo 5.1 "z" [1], Termo 1 "y" [1], Termo 7 "y" [2]]
+
+multiplyPolynoms [(Termo 2 "x" [1]), (Termo 1 "" [])] [(Termo 1 "x" [2]), (Termo 3 "x" [1]), (Termo 4 "" [])]

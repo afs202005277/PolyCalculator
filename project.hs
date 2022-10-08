@@ -20,7 +20,7 @@ instance Ord Termo where
     | otherwise = GT
 
 normalize :: Polynom -> Polynom
-normalize p = sort (filter (\x -> coef x /= 0) (sumPolynoms p))
+normalize p = reverse (sort (filter (\x -> coef x /= 0) (sumPolynoms p)))
 
 isEqual :: Termo -> Termo -> Bool
 isEqual t1 t2 = variable t1 == variable t2 && expo t1 == expo t2
@@ -55,3 +55,19 @@ sumMatchingPolynoms (p1 : p2 : ps) = Termo (coef p1 + coef p2) (variable p1) (ex
 
 sumPolynoms :: Polynom -> Polynom
 sumPolynoms p = concatMap sumMatchingPolynoms (grouping p)
+
+expandExponents :: String -> [Int] -> String
+expandExponents [] _ = []
+expandExponents _ [] = []
+expandExponents (x:xs) (n:ns) = replicate n x ++ expandExponents xs ns
+
+collapseExponents :: String -> [Int]
+collapseExponents [] = []
+collapseExponents (x:xs) = length (filter (x==) (x:xs)) : collapseExponents (filter (x/=) xs)
+
+multiplyTerms :: Termo -> Termo -> Termo
+multiplyTerms t1 t2 = Termo (coef t1 * coef t2) (nub variables) (collapseExponents variables)
+                      where variables = expandExponents (variable t1) (expo t1) ++ expandExponents (variable t2) (expo t2)
+
+multiplyPolynoms :: Polynom -> Polynom -> Polynom
+multiplyPolynoms p1 p2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
