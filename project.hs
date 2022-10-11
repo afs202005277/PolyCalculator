@@ -103,3 +103,19 @@ alphaSort var expo = unzip (sortBy sortGT (zip var expo))
 
 organize :: Termo -> Termo
 organize ter = Termo (coef ter) org_var org_exp where (org_var, org_exp) = alphaSort (variable ter) (expo ter)
+
+
+removeZeroExp :: String -> [Int] -> (String, [Int])
+removeZeroExp "" [] = ("", [])
+removeZeroExp var expo
+    | head expo == 0 = removeZeroExp (tail var) (tail expo)
+    | otherwise = (head var : altvar, head expo : altexpo) where (altvar, altexpo) = removeZeroExp (tail var) (tail expo)
+
+findVar :: String -> [Int] -> Char -> (Int, [Int])
+findVar "" expo _ = (-1, expo)
+findVar var expo lookingfor
+    | head var == lookingfor = (head expo, (head expo)-1 : (tail expo))
+    | otherwise = (i, head expo : e) where (i, e) = findVar (tail var) (tail expo) lookingfor
+
+derivative :: Polynom -> Char -> [Termo]
+derivative pol var = [Termo ((coef ter)* fromIntegral coefmult) fixedvar fixedexp | ter <- pol, let (coefmult, defexpos) = findVar (variable ter) (expo ter) var, coefmult /= -1, let (fixedvar, fixedexp) = removeZeroExp (variable ter) defexpos]
