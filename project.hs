@@ -5,6 +5,9 @@ import Data.List
 import Data.Maybe
 import Text.Read (readMaybe)
 
+import Data.List (sortBy)
+import Data.Function (on)
+
 type Polynom = [Termo]
 
 data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq, Show)
@@ -72,17 +75,31 @@ multiplyTerms t1 t2 = Termo (coef t1 * coef t2) (nub variables) (collapseExponen
 multiplyPolynoms :: Polynom -> Polynom -> Polynom
 multiplyPolynoms p1 p2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
 
-aux1 :: String -> [Int] -> String
-aux1 [] [] = ""
-aux1 var exp
-    | head exp == 1 = "*" <> show (head var) <> aux1 (tail var) (tail exp)
-    | otherwise = "*" <> show (head var) <> "^" <> show (head exp) <> aux1 (tail var) (tail exp)
+variableWithExpo :: String -> [Int] -> String
+variableWithExpo [] [] = ""
+variableWithExpo var exp
+    | head exp == 1 = "*" <> show (head var) <> variableWithExpo (tail var) (tail exp)
+    | otherwise = "*" <> show (head var) <> "^" <> show (head exp) <> variableWithExpo (tail var) (tail exp)
 
-aux2 :: Termo -> String
-aux2 ter = show (coef ter) <> (aux1 (variable ter) (expo ter))
+termoToString :: Termo -> String
+termoToString ter = show (coef ter) <> (variableWithExpo (variable ter) (expo ter))
 
 polyToString :: Polynom -> String
 polyToString pol
-    | length pol == 1 = aux2 (last pol)
-    | head (aux2 (last pol)) == '-' = polyToString (init pol) <> " - " <> tail (aux2 (last pol))
-    | otherwise = polyToString (init pol) <> " + " <> aux2 (last pol)
+    | length pol == 1 = termoToString (last pol)
+    | head (termoToString (last pol)) == '-' = polyToString (init pol) <> " - " <> tail (termoToString (last pol))
+    | otherwise = polyToString (init pol) <> " + " <> termoToString (last pol)
+
+
+
+sortGT :: (Ord a1, Ord a2) => (a1, a2) -> (a1, a2) -> Ordering
+sortGT (a1, b1) (a2, b2)
+  | a1 < a2 = LT
+  | a1 > a2 = GT
+  | a1 == a2 = compare b1 b2
+
+alphaSort :: String -> [Int] -> (String, [Int])
+alphaSort var expo = unzip (sortBy sortGT (zip var expo))
+
+organize :: Termo -> Termo
+organize ter = Termo (coef ter) org_var org_exp where (org_var, org_exp) = alphaSort (variable ter) (expo ter)
