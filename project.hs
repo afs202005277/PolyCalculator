@@ -71,3 +71,18 @@ multiplyTerms t1 t2 = Termo (coef t1 * coef t2) (nub variables) (collapseExponen
 
 multiplyPolynoms :: Polynom -> Polynom -> Polynom
 multiplyPolynoms p1 p2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
+
+aux1 :: String -> [Int] -> String
+aux1 [] [] = ""
+aux1 var exp
+    | head exp == 1 = "*" <> show (head var) <> aux1 (tail var) (tail exp)
+    | otherwise = "*" <> show (head var) <> "^" <> show (head exp) <> aux1 (tail var) (tail exp)
+
+aux2 :: Termo -> String
+aux2 ter = show (coef ter) <> (aux1 (variable ter) (expo ter))
+
+polyToString :: Polynom -> String
+polyToString pol
+    | length pol == 1 = aux2 (last pol)
+    | head (aux2 (last pol)) == '-' = polyToString (init pol) <> " - " <> tail (aux2 (last pol))
+    | otherwise = polyToString (init pol) <> " + " <> aux2 (last pol)
