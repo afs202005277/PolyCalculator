@@ -16,7 +16,7 @@ instance Ord Termo where
     | otherwise = GT
 
 normalize :: Polynom -> Polynom
-normalize p = reverse (sort (filter (\x -> coef x /= 0) (sumPolynoms p)))
+normalize p = sort (filter (\x -> coef x /= 0) (sumPolynoms p))
 
 isSummable :: Termo -> Termo -> Bool
 isSummable t1 t2 = variable t1 == variable t2 && expo t1 == expo t2
