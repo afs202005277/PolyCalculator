@@ -18,12 +18,12 @@ instance Ord Termo where
 normalize :: Polynom -> Polynom
 normalize p = reverse (sort (filter (\x -> coef x /= 0) (sumPolynoms p)))
 
-isEqual :: Termo -> Termo -> Bool
-isEqual t1 t2 = variable t1 == variable t2 && expo t1 == expo t2
+isSummable :: Termo -> Termo -> Bool
+isSummable t1 t2 = variable t1 == variable t2 && expo t1 == expo t2
 
 grouping :: Polynom -> [Polynom]
 grouping [] = []
-grouping (x : xs) = filter (isEqual x) (x : xs) : grouping (filter (not . isEqual x) xs)
+grouping (x : xs) = filter (isSummable x) (x : xs) : grouping (filter (not . isSummable x) xs)
 
 findExponents :: String -> [Int]
 findExponents [] = []
@@ -44,13 +44,13 @@ wordSplit str =
                                                                                                                    signal = if idx_term > 0 && head (words str !! (idx_term -1)) == '-' then '-' else '+', uterm /= "+" && uterm /= "-"
   ]
 
-sumMatchingPolynoms :: Polynom -> Polynom
-sumMatchingPolynoms [] = []
-sumMatchingPolynoms [p] = [p]
-sumMatchingPolynoms (p1 : p2 : ps) = Termo (coef p1 + coef p2) (variable p1) (expo p1) : sumMatchingPolynoms ps
+sumMatchingTerms :: [Termo] -> [Termo]
+sumMatchingTerms [] = []
+sumMatchingTerms [p] = [p]
+sumMatchingTerms (p1 : p2 : ps) = Termo (coef p1 + coef p2) (variable p1) (expo p1) : sumMatchingTerms ps
 
 sumPolynoms :: Polynom -> Polynom
-sumPolynoms p = concatMap sumMatchingPolynoms (grouping p)
+sumPolynoms p = concatMap sumMatchingTerms (grouping p)
 
 expandExponents :: String -> [Int] -> String
 expandExponents [] _ = []
