@@ -33,24 +33,26 @@ findExponents (x : y : xs)
   | otherwise = 1 : findExponents (y : xs)
 
 termoFactory :: String -> Termo
-termoFactory str = Termo coefficient (filter isAlpha str) (findExponents (filter (\x -> isAlpha x || isDigit x) (dropWhile (\x -> (not . isAlpha) x && x /= '*') str)))
+termoFactory str = uncurry (Termo (fromMaybe 1 attempt_coef)) ordered_term
   where
-    coefficient = fromMaybe 1 attempt
-    attempt = readMaybe (takeWhile (\x -> (not . isAlpha) x && x /= '*') str) :: Maybe Float
+    attempt_coef = readMaybe (if length coef_component == 1 && head coef_component == '-' then "-1" else coef_component) :: Maybe Float
+    coef_component = takeWhile (\x -> (not . isAlpha) x && x /= '*') str
+    ordered_term = alphaSort (filter isAlpha str) (findExponents (filter (\x -> isAlpha x || isDigit x) (dropWhile (\x -> (not . isAlpha) x && x /= '*') str)))
 
 wordSplit :: String -> Polynom
 wordSplit str =
   [ termoFactory (if signal == '+' then uterm else signal : uterm) | idx_term <- [0 .. length (words str) -1], let uterm = words str !! idx_term
                                                                                                                    signal = if idx_term > 0 && head (words str !! (idx_term -1)) == '-' then '-' else '+', uterm /= "+" && uterm /= "-"
   ]
-
-sumMatchingTerms :: [Termo] -> [Termo]
-sumMatchingTerms [] = []
-sumMatchingTerms [p] = [p]
-sumMatchingTerms (p1 : p2 : ps) = Termo (coef p1 + coef p2) (variable p1) (expo p1) : sumMatchingTerms ps
+sumMatchingTerms :: [Termo] -> Termo
+sumMatchingTerms [] = Termo 0 "" []
+sumMatchingTerms [p] = p
+sumMatchingTerms (p1 : p2 : ps) = sumMatchingTerms (recent_term : ps)
+  where
+    recent_term = Termo (coef p1 + coef p2) (variable p1) (expo p1)
 
 sumPolynoms :: Polynom -> Polynom
-sumPolynoms p = concatMap sumMatchingTerms (grouping p)
+sumPolynoms p = normalize $ map sumMatchingTerms (grouping p)
 
 expandExponents :: String -> [Int] -> String
 expandExponents [] _ = []
@@ -67,7 +69,7 @@ multiplyTerms t1 t2 = Termo (coef t1 * coef t2) (nub variables) (collapseExponen
     variables = expandExponents (variable t1) (expo t1) ++ expandExponents (variable t2) (expo t2)
 
 multiplyPolynoms :: Polynom -> Polynom -> Polynom
-multiplyPolynoms p1 p2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
+multiplyPolynoms p1 p2 = normalize [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
 
 variableWithExpo :: String -> [Int] -> String
 variableWithExpo [] [] = ""
@@ -113,5 +115,7 @@ findVar var expo lookingfor
     (i, e) = findVar (tail var) (tail expo) lookingfor
 
 derivative :: Polynom -> Char -> [Termo]
-derivative pol var = [Termo (coef ter * fromIntegral coefmult) fixedvar fixedexp | ter <- pol, let (coefmult, defexpos) = findVar (variable ter) (expo ter) var
-                                                                                                   (fixedvar, fixedexp) = removeZeroExp (variable ter) defexpos, coefmult /= -1]
+derivative pol var = normalize
+  [ Termo (coef ter * fromIntegral coefmult) fixedvar fixedexp | ter <- pol, let (coefmult, defexpos) = findVar (variable ter) (expo ter) var
+                                                                                 (fixedvar, fixedexp) = removeZeroExp (variable ter) defexpos, coefmult /= -1
+  ]

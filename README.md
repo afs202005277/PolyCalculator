@@ -3,17 +3,18 @@
 ## To do:
 - [x] polinomio -> string
 - [x] derivada (implica divisao)
-- [ ] exemplos de utilizacao
+- [x] exemplos de utilizacao
 - [x] ordenar variaveis -> o programa considera que "2xyz" é diferente de "2yzx"
-- [ ] Integrar ordenacao de variaveis com funcoes
-- [ ] Escrever relatorio
+- [x] Integrar ordenacao de variaveis com funcoes
+- [x] Escrever relatorio
 - [ ] Comentar codigo
-- [ ] resolver bug: sumPolynoms [Termo 2 "y" [1], Termo 5.1 "y" [1], Termo 1 "y" [1]]
+- [x] resolver bug: `sumPolynoms [Termo 2 "y" [1], Termo 5.1 "y" [1], Termo 1 "y" [1]]`
 - [ ] Aula: perguntar ao stor a questao de o polyToString imprimir plicas com as variaveis
-- [ ] Todos os resultados das funcoes deviam estar automaticamente normalizados
+- [x] Todos os resultados das funcoes deviam estar automaticamente normalizados
 - [ ] Funcoes receberem string e chamarem elas o wordsplit?
-- [ ] Bug: wordSplit "2*x^3*y^2 - y + 3"
+- [x] Bug: `wordSplit "2*x^3*y^2 - y + 3"`
 - [ ] Adicionar espacos no polyToString para ficar igual ao input do wordsplit
+- [ ] TESTAR TUDO E MAIS ALGUMA COISA
 
 ### Representação interna dos polinómios:
 
@@ -80,15 +81,18 @@ Retorna uma lista de polinómios, ou seja, uma lista de listas de termos sendo q
 Exemplo: `grouping [Termo 5 "y" [2], Termo 7 "y" [3], Termo 8 "z" [2], Termo 2 "y" [2]]`
 
 ```haskell
-sumMatchingPolynoms :: Polynom -> Polynom
+sumMatchingTerms :: [Termo] -> Termo
 ```
-**TO BE CORRECTED:** Recebe uma lista de termos que podem ser somados e soma-os, devolvendo o termo resultante.
+Recebe uma lista de termos que podem ser somados e soma-os recursivamente, devolvendo o termo resultante.
+
+Exemplo: `sumMatchingTerms [Termo 2 "y" [1], Termo 1 "y" [1], Termo 5 "y" [1]]`
 
 ```haskell
 sumPolynoms :: Polynom -> Polynom
 ```
-**TO BE CORRECTED:** Esta é a função principal desta funcionalidade. Recebe uma lista de termos (polinómio) e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
+Esta é a função principal desta funcionalidade. Recebe uma lista de termos (polinómio) e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
 
+Exemplo: `sumPolynoms [Termo 0 "x" [2], Termo 2 "y" [1], Termo 5.1 "z" [1], Termo 1 "y" [1], Termo 7 "y" [2], Termo 2 "y" [1]]`
 
 #### Multiplicação de polinómios:
 Funções usadas:
