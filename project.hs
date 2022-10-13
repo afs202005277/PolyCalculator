@@ -16,7 +16,7 @@ instance Ord Termo where
     | otherwise = GT
 
 normalize :: Polynom -> Polynom
-normalize p = sort (filter (\x -> coef x /= 0) (sumPolynoms p))
+normalize p = sort (filter (\x -> coef x /= 0) (sumPolynoms [p]))
 
 isSummable :: Termo -> Termo -> Bool
 isSummable t1 t2 = variable t1 == variable t2 && expo t1 == expo t2
@@ -33,11 +33,10 @@ findExponents (x : y : xs)
   | otherwise = 1 : findExponents (y : xs)
 
 termoFactory :: String -> Termo
-termoFactory str = uncurry (Termo (fromMaybe 1 attempt_coef)) ordered_term
+termoFactory str = organize (Termo (fromMaybe 1 attempt_coef) (filter isAlpha str) (findExponents (filter (\x -> isAlpha x || isDigit x) (dropWhile (\x -> (not . isAlpha) x && x /= '*') str))))
   where
     attempt_coef = readMaybe (if length coef_component == 1 && head coef_component == '-' then "-1" else coef_component) :: Maybe Float
     coef_component = takeWhile (\x -> (not . isAlpha) x && x /= '*') str
-    ordered_term = alphaSort (filter isAlpha str) (findExponents (filter (\x -> isAlpha x || isDigit x) (dropWhile (\x -> (not . isAlpha) x && x /= '*') str)))
 
 wordSplit :: String -> Polynom
 wordSplit str =
@@ -51,8 +50,8 @@ sumMatchingTerms (p1 : p2 : ps) = sumMatchingTerms (recent_term : ps)
   where
     recent_term = Termo (coef p1 + coef p2) (variable p1) (expo p1)
 
-sumPolynoms :: Polynom -> Polynom
-sumPolynoms p = normalize $ map sumMatchingTerms (grouping p)
+sumPolynoms :: [Polynom] -> Polynom
+sumPolynoms p = map sumMatchingTerms (grouping (concat p))
 
 expandExponents :: String -> [Int] -> String
 expandExponents [] _ = []
@@ -69,7 +68,7 @@ multiplyTerms t1 t2 = Termo (coef t1 * coef t2) (nub variables) (collapseExponen
     variables = expandExponents (variable t1) (expo t1) ++ expandExponents (variable t2) (expo t2)
 
 multiplyPolynoms :: Polynom -> Polynom -> Polynom
-multiplyPolynoms p1 p2 = normalize [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
+multiplyPolynoms p1 p2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
 
 variableWithExpo :: String -> [Int] -> String
 variableWithExpo [] [] = ""
@@ -83,10 +82,11 @@ termoToString ter
             | otherwise = show (coef ter) <> variableWithExpo (variable ter) (expo ter)
 
 polyToString :: Polynom -> String
-polyToString pol
+polyToString p
   | length pol == 1 = termoToString (last pol)
   | head (termoToString (last pol)) == '-' = polyToString (init pol) <> " - " <> tail (termoToString (last pol))
   | otherwise = polyToString (init pol) <> " + " <> termoToString (last pol)
+  where pol = normalize $ map organize p
 
 sortGT :: (Ord a1, Ord a2) => (a1, a2) -> (a1, a2) -> Ordering
 sortGT (a1, b1) (a2, b2)
