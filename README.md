@@ -191,4 +191,4 @@ findVar :: String -> [Int] -> Char -> (Int, [Int])
 Esta função trata de descobrir o expoente da variável dada e devolve a lista de expoentes atualizada após uma derivação em ordem à variável dada.
 Por exemplo: findVar "xyz" [3, 2, 3] 'x' retorna (3, [2, 2, 3])
 
-Exemplo: findVar "xyz" [3, 2, 3] 'x'
+Exemplo: `findVar "xyz" [3, 2, 3] 'x'`
