@@ -6,8 +6,8 @@
 - [x] exemplos de utilizacao
 - [x] ordenar variaveis -> o programa considera que "2xyz" é diferente de "2yzx"
 - [x] Integrar ordenacao de variaveis com funcoes
-- [x] Escrever relatorio
-- [ ] Comentar codigo
+- [ ] Escrever relatorio - FALTA O findExponents
+- [ ] Comentar codigo - FALTA O findExponents
 - [x] resolver bug: `sumPolynoms [Termo 2 "y" [1], Termo 5.1 "y" [1], Termo 1 "y" [1]]`
 - [x] Aula: perguntar ao stor a questao de o polyToString imprimir plicas com as variaveis
 - [x] Todos os resultados das funcoes deviam estar automaticamente normalizados
@@ -47,11 +47,34 @@ Recebe uma string correspondente a 1 termo e faz parse da mesma de forma a obter
 Exemplo: `termoFactory "-2*x^3*y^2"`
 
 ```haskell
+variableWithExpo :: String -> [Int] -> String
+```
+Função auxiliar do polyToString que cria a string que adiciona a variavel ao expoente.
+Por exemplo: variableWithExpo "xy" [2, 1] retorna "x^2*y"
+
+Exemplo: `variableWithExpo "xy" [2, 1]`
+
+```haskell
+termoToString :: Termo -> String
+```
+Função auxiliar do polyToString que adiciona o coeficiente ao resultado do variableWithExpo. Com a exceção de quando o coeficiente é 1.
+Por exemplo: termoToString (Termo 3 "xy" [2, 1]) retorna "3.0*x^2*y"
+
+Exemplo: `termoToString (Termo 3 "xy" [2, 1])`
+
+```haskell
 polyToString :: Polynom -> String
 ```
 Função responsável pela conversão da representação interna do polinómio para uma string percetível pelo utilizador.
 
 Exemplo: `polyToString $ wordSplit "2*x^3*y^2 - 5*y + 3"`
+
+```haskell
+sortGT :: (Ord a1, Ord a2) => (a1, a2) -> (a1, a2) -> Ordering
+```
+Função auxiliar do organize que ordena por ordem crescente as variáveis com os seus respetivos expoentes.
+
+Exemplo: `sortGT ("x", 2) ("y", 3)`
 
 ```haskell
 organize :: Termo -> Termo
