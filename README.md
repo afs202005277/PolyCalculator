@@ -11,7 +11,7 @@
 - [x] resolver bug: `sumPolynoms [Termo 2 "y" [1], Termo 5.1 "y" [1], Termo 1 "y" [1]]`
 - [x] Aula: perguntar ao stor a questao de o polyToString imprimir plicas com as variaveis
 - [x] Todos os resultados das funcoes deviam estar automaticamente normalizados
-- [ ] Funcoes receberem string e chamarem elas o wordsplit? fazer
+- [x] Funcoes receberem string e chamarem elas o wordsplit? fazer
 - [x] Bug: `wordSplit "2*x^3*y^2 - y + 3"`
 - [x] Adicionar espacos no polyToString para ficar igual ao input do wordsplit
 - [x] Completar relatorio com a derivada
@@ -63,11 +63,11 @@ Exemplo: `organize $ Termo 3 "zyx" [3, 2, 1]`
 #### Normalização de polinómios:
 Função usada:
 ```haskell
-normalize :: Polynom -> Polynom
+normalize :: String -> Polynom
 ```
-Esta função recebe um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. Para a ordenação, definimos um overload da classe Ord.
+Esta função recebe um string de um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. Para a ordenação, definimos um overload da classe Ord.
 
-Exemplo: `normalize  [Termo 0 "x" [2], Termo 2 "y" [1], Termo 5.1 "z" [1], Termo 1 "y" [1], Termo 7 "y" [2]]`
+Exemplo: `normalize "0*x + 5*y + 3*y"`
 
 #### Soma de polinómios:
 Funções usadas:
@@ -98,7 +98,7 @@ Exemplo: `sumMatchingTerms [Termo 2 "y" [1], Termo 1 "y" [1], Termo 5 "y" [1]]`
 ```haskell
 sumPolynoms :: [String] -> Polynom
 ```
-Esta é a função principal desta funcionalidade. Recebe uma lista de termos (polinómio) e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
+Esta é a função principal desta funcionalidade. Recebe uma polinómio no formato de string e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
 
 Exemplo: `sumPolynoms ["2*x + 5*y", "8*x + 2*y"]`
 
@@ -108,7 +108,7 @@ Funções usadas:
 ```haskell
 multiplyPolynoms :: String -> String -> Polynom
 ```
-Esta é a função principal desta funcionalidade. Recebe dois polinómios e devolve o resultado da multiplicação dos dois, recorrendo a uma lista em compreensão e à função multiplyTerms que está explicada abaixo.
+Esta é a função principal desta funcionalidade. Recebe dois polinómios no formato de string e devolve o resultado da multiplicação dos dois, recorrendo a uma lista em compreensão e à função multiplyTerms que está explicada abaixo.
 
 Exemplo (propriedade distributiva): `multiplyPolynoms "2*x + 5*y" "6*y + 9*x"`
 
@@ -163,7 +163,7 @@ Exemplo: findVar "xyz" [3, 2, 3] 'x'
 derivative :: String -> Char -> Polynom
 ```
 
-Esta função usa a função findVar (para encontrar o atual expoente da variável e arranjar os expoentes da derivada) e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode ter ido para zero) para efetuar a derivada da variável dada.
+Esta função recebe um polinómio no formato de string e uma variável a derivar e usa a função findVar (para encontrar o atual expoente da variável e arranjar os expoentes da derivada) e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode ter ido para zero) para efetuar a derivada da variável dada.
 Por exemplo: derivative "2*x^2*y + 5*x" 'x' retorna [Termo {coef = 5.0, variable = "", expo = []},Termo {coef = 4.0, variable = "xy", expo = [1,1]}]
 
 Exemplo: `derivative "2*x^2*y + 5*x" 'x'`
