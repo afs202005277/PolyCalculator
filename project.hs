@@ -74,8 +74,8 @@ multiplyPolynoms p1 p2 = normalize [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
 variableWithExpo :: String -> [Int] -> String
 variableWithExpo [] [] = ""
 variableWithExpo var exp
-  | head exp == 1 = "*" <> show (head var) <> variableWithExpo (tail var) (tail exp)
-  | otherwise = "*" <> show (head var) <> "^" <> show (head exp) <> variableWithExpo (tail var) (tail exp)
+  | head exp == 1 = "*" <> [head var] <> variableWithExpo (tail var) (tail exp)
+  | otherwise = "*" <> [head var] <> "^" <> show (head exp) <> variableWithExpo (tail var) (tail exp)
 
 termoToString :: Termo -> String
 termoToString ter = show (coef ter) <> variableWithExpo (variable ter) (expo ter)
