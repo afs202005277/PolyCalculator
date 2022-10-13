@@ -14,7 +14,7 @@
 - [ ] Funcoes receberem string e chamarem elas o wordsplit? fazer
 - [x] Bug: `wordSplit "2*x^3*y^2 - y + 3"`
 - [x] Adicionar espacos no polyToString para ficar igual ao input do wordsplit
-- [ ] Completar relatorio com a derivada
+- [x] Completar relatorio com a derivada
 - [ ] TESTAR TUDO E MAIS ALGUMA COISA
 
 ### Representação interna dos polinómios:
@@ -52,6 +52,13 @@ polyToString :: Polynom -> String
 Função responsável pela conversão da representação interna do polinómio para uma string percetível pelo utilizador.
 
 Exemplo: `polyToString $ wordSplit "2*x^3*y^2 - 5*y + 3"`
+
+```haskell
+organize :: Termo -> Termo
+```
+Função responsável por organizar as variáveis dentro dos termos por ordem alfabetica. Necessário para o programa não achar que "xy" é diferente de "yx"
+
+Exemplo: `organize $ Termo 3 "zyx" [3, 2, 1]`
 
 #### Normalização de polinómios:
 Função usada:
@@ -132,3 +139,31 @@ Exemplo: `collapseExponents "xyyzzz"`
 Ideia geral da multiplicação: multiplicam-se os coeficientes, expande-se os expoentes de cada termo (função expandExponents) e concatena-se a expansão resultante. No final, remove-se os duplicados (obtendo assim a lista de variáveis final) e recalcula-se os expoentes (função collapseExponents).
 
 #### Derivada de um polinómio:
+Funções usadas:
+
+```haskell
+removeZeroExp :: String -> [Int] -> (String, [Int])
+```
+
+Esta função trata de remover as variáveis que têm expoente zero, Ou seja, se tivermos um termo com x^0 = 1, esta variável é removida.
+Por exemplo: removeZeroExp "xyz" [3,0,2] retorna ("xz", [3,2])
+
+Exemplo: `removeZeroExp "xyz" [3,0,2]`
+
+```haskell
+findVar :: String -> [Int] -> Char -> (Int, [Int])
+```
+
+Esta função trata de descobrir o expoente da variável dada e devolve a lista de expoentes atualizada após uma derivação em ordem à variável dada.
+Por exemplo: findVar "xyz" [3, 2, 3] 'x' retorna (3, [2, 2, 3])
+
+Exemplo: findVar "xyz" [3, 2, 3] 'x'
+
+```haskell
+derivative :: Polynom -> Char -> Polynom
+```
+
+Esta função usa a função findVar (para encontrar o atual expoente da variável e arranjar os expoentes da derivada) e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode ter ido para zero) para efetuar a derivada da variável dada.
+Por exemplo: multiplyPolynoms [Termo 3 "xy" [2, 3], Termo 2 "x" [1]] 'x' retorna [Termo 6 "xy" [1, 3], Termo 2 "" []]
+
+Exemplo: `multiplyPolynoms [Termo 3 "xy" [2, 3], Termo 2 "x" [1]] 'x'`
