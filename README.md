@@ -9,7 +9,7 @@
 - [x] Escrever relatorio
 - [ ] Comentar codigo
 - [x] resolver bug: `sumPolynoms [Termo 2 "y" [1], Termo 5.1 "y" [1], Termo 1 "y" [1]]`
-- [ ] Aula: perguntar ao stor a questao de o polyToString imprimir plicas com as variaveis
+- [x] Aula: perguntar ao stor a questao de o polyToString imprimir plicas com as variaveis
 - [x] Todos os resultados das funcoes deviam estar automaticamente normalizados
 - [ ] Funcoes receberem string e chamarem elas o wordsplit? fazer
 - [x] Bug: `wordSplit "2*x^3*y^2 - y + 3"`
