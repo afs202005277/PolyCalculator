@@ -78,7 +78,9 @@ variableWithExpo var exp
   | otherwise = "*" <> [head var] <> "^" <> show (head exp) <> variableWithExpo (tail var) (tail exp)
 
 termoToString :: Termo -> String
-termoToString ter = show (coef ter) <> variableWithExpo (variable ter) (expo ter)
+termoToString ter 
+            | coef ter == 1 = tail $ variableWithExpo (variable ter) (expo ter)
+            | otherwise = show (coef ter) <> variableWithExpo (variable ter) (expo ter)
 
 polyToString :: Polynom -> String
 polyToString pol
