@@ -4,6 +4,8 @@ import Data.List
 import Data.Maybe
 import Text.Read (readMaybe)
 
+-- learn.hfm.io/expressions.html
+
 type Polynom = [Termo]
 
 data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq, Show)
@@ -52,7 +54,7 @@ sumMatchingTerms (p1 : p2 : ps) = sumMatchingTerms (recent_term : ps)
     recent_term = Termo (coef p1 + coef p2) (variable p1) (expo p1)
 
 sumPolynoms :: Polynom -> Polynom
-sumPolynoms p = normalize $ map sumMatchingTerms (grouping p)
+sumPolynoms p = map sumMatchingTerms (grouping p)
 
 expandExponents :: String -> [Int] -> String
 expandExponents [] _ = []
@@ -69,7 +71,7 @@ multiplyTerms t1 t2 = Termo (coef t1 * coef t2) (nub variables) (collapseExponen
     variables = expandExponents (variable t1) (expo t1) ++ expandExponents (variable t2) (expo t2)
 
 multiplyPolynoms :: Polynom -> Polynom -> Polynom
-multiplyPolynoms p1 p2 = normalize [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
+multiplyPolynoms p1 p2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
 
 variableWithExpo :: String -> [Int] -> String
 variableWithExpo [] [] = ""
