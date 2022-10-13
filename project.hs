@@ -75,6 +75,9 @@ multiplyTerms t1 t2 = Termo (coef t1 * coef t2) (nub variables) (collapseExponen
 multiplyPolynoms :: Polynom -> Polynom -> Polynom
 multiplyPolynoms p1 p2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
 
+
+
+
 variableWithExpo :: String -> [Int] -> String
 variableWithExpo [] [] = ""
 variableWithExpo var exp
@@ -82,15 +85,16 @@ variableWithExpo var exp
     | otherwise = "*" <> show (head var) <> "^" <> show (head exp) <> variableWithExpo (tail var) (tail exp)
 
 termoToString :: Termo -> String
-termoToString ter = show (coef ter) <> (variableWithExpo (variable ter) (expo ter))
+termoToString ter
+  | coef ter == 1 = tail (variableWithExpo (variable ter) (expo ter))
+  | otherwise = show (coef ter) <> (variableWithExpo (variable ter) (expo ter))
 
 polyToString :: Polynom -> String
+polyToString [] = ""
 polyToString pol
     | length pol == 1 = termoToString (last pol)
     | head (termoToString (last pol)) == '-' = polyToString (init pol) <> " - " <> tail (termoToString (last pol))
     | otherwise = polyToString (init pol) <> " + " <> termoToString (last pol)
-
-
 
 sortGT :: (Ord a1, Ord a2) => (a1, a2) -> (a1, a2) -> Ordering
 sortGT (a1, b1) (a2, b2)
@@ -103,7 +107,6 @@ alphaSort var expo = unzip (sortBy sortGT (zip var expo))
 
 organize :: Termo -> Termo
 organize ter = Termo (coef ter) org_var org_exp where (org_var, org_exp) = alphaSort (variable ter) (expo ter)
-
 
 removeZeroExp :: String -> [Int] -> (String, [Int])
 removeZeroExp "" [] = ("", [])
