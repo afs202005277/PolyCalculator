@@ -141,6 +141,8 @@ Ideia geral da multiplicação: multiplicam-se os coeficientes, expande-se os ex
 #### Derivada de um polinómio:
 Funções usadas:
 
+Ideia geral da derivação: procura-se os expoentes da variável que se pretende derivar (findVar), multiplica-se o coeficiente por esse valor e decrementa-se o valor dos expoentes dessa variável. No caso do expoente ficar a zero, a variável é retirada (removeZeroExp).
+
 ```haskell
 derivative :: String -> Char -> Polynom
 ```
