@@ -4,6 +4,8 @@ import Data.List
 import Data.Maybe
 import Text.Read (readMaybe)
 
+-- learn.hfm.io/expressions.html
+
 type Polynom = [Termo]
 
 data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq, Show)
