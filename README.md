@@ -96,21 +96,21 @@ Recebe uma lista de termos que podem ser somados e soma-os recursivamente, devol
 Exemplo: `sumMatchingTerms [Termo 2 "y" [1], Termo 1 "y" [1], Termo 5 "y" [1]]`
 
 ```haskell
-sumPolynoms :: Polynom -> Polynom
+sumPolynoms :: [String] -> Polynom
 ```
 Esta é a função principal desta funcionalidade. Recebe uma lista de termos (polinómio) e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
 
-Exemplo: `sumPolynoms [Termo 0 "x" [2], Termo 2 "y" [1], Termo 5.1 "z" [1], Termo 1 "y" [1], Termo 7 "y" [2], Termo 2 "y" [1]]`
+Exemplo: `sumPolynoms ["2*x + 5*y", "8*x + 2*y"]`
 
 #### Multiplicação de polinómios:
 Funções usadas:
 
 ```haskell
-multiplyPolynoms :: Polynom -> Polynom -> Polynom
+multiplyPolynoms :: String -> String -> Polynom
 ```
 Esta é a função principal desta funcionalidade. Recebe dois polinómios e devolve o resultado da multiplicação dos dois, recorrendo a uma lista em compreensão e à função multiplyTerms que está explicada abaixo.
 
-Exemplo (propriedade distributiva): `multiplyPolynoms [Termo 1 "a" [1], Termo 1 "b" [1]] [Termo 1 "c" [1], Termo 1 "d" [1]]`
+Exemplo (propriedade distributiva): `multiplyPolynoms "2*x + 5*y" "6*y + 9*x"`
 
 ```haskell
 multiplyTerms :: Termo -> Termo -> Termo
@@ -160,10 +160,10 @@ Por exemplo: findVar "xyz" [3, 2, 3] 'x' retorna (3, [2, 2, 3])
 Exemplo: findVar "xyz" [3, 2, 3] 'x'
 
 ```haskell
-derivative :: Polynom -> Char -> Polynom
+derivative :: String -> Char -> Polynom
 ```
 
 Esta função usa a função findVar (para encontrar o atual expoente da variável e arranjar os expoentes da derivada) e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode ter ido para zero) para efetuar a derivada da variável dada.
-Por exemplo: multiplyPolynoms [Termo 3 "xy" [2, 3], Termo 2 "x" [1]] 'x' retorna [Termo 6 "xy" [1, 3], Termo 2 "" []]
+Por exemplo: derivative "2*x^2*y + 5*x" 'x' retorna [Termo {coef = 5.0, variable = "", expo = []},Termo {coef = 4.0, variable = "xy", expo = [1,1]}]
 
-Exemplo: `multiplyPolynoms [Termo 3 "xy" [2, 3], Termo 2 "x" [1]] 'x'`
+Exemplo: `derivative "2*x^2*y + 5*x" 'x'`
