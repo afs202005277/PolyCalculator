@@ -142,6 +142,15 @@ Ideia geral da multiplicação: multiplicam-se os coeficientes, expande-se os ex
 Funções usadas:
 
 ```haskell
+derivative :: String -> Char -> Polynom
+```
+
+Esta é a função principal. Recebe um polinómio no formato de string e uma variável a derivar e usa a função findVar (para encontrar o atual expoente da variável e arranjar os expoentes da derivada) e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode ter ido para zero) para efetuar a derivada da variável dada.
+Por exemplo: derivative "2*x^2*y + 5*x" 'x' retorna [Termo {coef = 5.0, variable = "", expo = []},Termo {coef = 4.0, variable = "xy", expo = [1,1]}]
+
+Exemplo: `derivative "2*x^2*y + 5*x" 'x'`
+
+```haskell
 removeZeroExp :: String -> [Int] -> (String, [Int])
 ```
 
@@ -158,12 +167,3 @@ Esta função trata de descobrir o expoente da variável dada e devolve a lista 
 Por exemplo: findVar "xyz" [3, 2, 3] 'x' retorna (3, [2, 2, 3])
 
 Exemplo: findVar "xyz" [3, 2, 3] 'x'
-
-```haskell
-derivative :: String -> Char -> Polynom
-```
-
-Esta função recebe um polinómio no formato de string e uma variável a derivar e usa a função findVar (para encontrar o atual expoente da variável e arranjar os expoentes da derivada) e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode ter ido para zero) para efetuar a derivada da variável dada.
-Por exemplo: derivative "2*x^2*y + 5*x" 'x' retorna [Termo {coef = 5.0, variable = "", expo = []},Termo {coef = 4.0, variable = "xy", expo = [1,1]}]
-
-Exemplo: `derivative "2*x^2*y + 5*x" 'x'`
