@@ -15,6 +15,7 @@
 - [x] Bug: `wordSplit "2*x^3*y^2 - y + 3"`
 - [x] Adicionar espacos no polyToString para ficar igual ao input do wordsplit
 - [ ] Completar relatorio com a derivada
+- [ ] Atualizar relatorio com nova funcao sumPolynom
 - [ ] TESTAR TUDO E MAIS ALGUMA COISA
 
 ### Representação interna dos polinómios:
