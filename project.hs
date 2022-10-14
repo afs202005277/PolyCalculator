@@ -4,13 +4,15 @@ import Data.List
 import Data.Maybe
 import Text.Read (readMaybe)
 
--- learn.hfm.io/expressions.html
 
 
 -- 1 polinómio é representado por uma lista de termos, sendo que, cada termo é composto por um coeficiente de vírgula flutuante, uma lista de variáveis e uma lista de expoentes.
 -- A associação entre as variáveis e os expoentes é feita recorrendo aos indíces de cada um, ou seja, o expoente que se encontra no indíce 2 é o expoente da variável no indíce 2 da respetiva lista.
-type Polynom = [Termo]
-data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq, Show)
+data Polynom = Polynom [Termo]
+data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq)
+
+instance Show Polynom where
+  show poly = polyToString poly
 
 instance Ord Termo where
   compare t1 t2
@@ -19,6 +21,8 @@ instance Ord Termo where
     | variable t1 == variable t2 && expo t1 == expo t2 = EQ
     | otherwise = GT
 
+extractListOfTerms :: Polynom -> [Termo]
+extractListOfTerms (Polynom lst) = lst
 
 {-
 Esta função recebe um string de um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), 
@@ -26,7 +30,7 @@ remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem
 Para a ordenação, definimos um overload da classe Ord.
 -}
 normalize :: String -> Polynom
-normalize p = sort (filter (\x -> coef x /= 0) (sumPolynoms [p]))
+normalize p = Polynom (sort (filter (\x -> coef x /= 0) $ extractListOfTerms (sumPolynoms [p])))
 
 {-
 Retorna um booleano que indica se os dois termos podem ser somados ou não, por outras palavras, verifica se os dois termos têm as mesmas variáveis e expoentes.
@@ -38,9 +42,9 @@ isSummable t1 t2 = variable t1 == variable t2 && expo t1 == expo t2
 Retorna uma lista de polinómios, ou seja, uma lista de listas de termos sendo que os elementos de cada sublista são elementos que podem ser somados entre si
 (esta função recorre à função isSummable para agrupar os elementos que podem ser somados).
 -}
-grouping :: Polynom -> [Polynom]
-grouping [] = []
-grouping (x : xs) = filter (isSummable x) (x : xs) : grouping (filter (not . isSummable x) xs)
+grouping :: Polynom -> [[Termo]]
+grouping (Polynom []) = []
+grouping (Polynom (x : xs)) = filter (isSummable x) (x : xs) : grouping (Polynom $ filter (not . isSummable x) xs)
 
 
 findExponents :: String -> [Int]
@@ -67,8 +71,8 @@ Função responsável por converter o input do utilizador (polinómio representa
 -}
 wordSplit :: String -> Polynom
 wordSplit str =
-  [ termoFactory (if signal == '+' then uterm else signal : uterm) | idx_term <- [0 .. length (words str) -1], let uterm = words str !! idx_term
-                                                                                                                   signal = if idx_term > 0 && head (words str !! (idx_term -1)) == '-' then '-' else '+', uterm /= "+" && uterm /= "-"
+  Polynom [ termoFactory (if signal == '+' then uterm else signal : uterm) | idx_term <- [0 .. length (words str) -1], let uterm = words str !! idx_term
+                                                                                                                           signal = if idx_term > 0 && head (words str !! (idx_term -1)) == '-' then '-' else '+', uterm /= "+" && uterm /= "-"
   ]
 
 {-
@@ -85,7 +89,7 @@ sumMatchingTerms (p1 : p2 : ps) = sumMatchingTerms (recent_term : ps)
 Esta é a função principal desta funcionalidade. Recebe uma polinómio no formato de string e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima.
 -}
 sumPolynoms :: [String] -> Polynom
-sumPolynoms p = map sumMatchingTerms (grouping (concat (map wordSplit p)))
+sumPolynoms p = Polynom $ map sumMatchingTerms (grouping (Polynom (concatMap extractListOfTerms (map wordSplit p))))
 
 {-
 Recebe a lista de variáveis e de expoentes de um termo e retorna uma string em que cada variável está repetida n vezes,
@@ -122,10 +126,10 @@ Esta é a função principal desta funcionalidade. Recebe dois polinómios no fo
 recorrendo a uma lista em compreensão e à função multiplyTerms que está explicada abaixo.
 -}
 multiplyPolynoms :: String -> String -> Polynom
-multiplyPolynoms pol1 pol2 = [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2] 
-  where 
-    p1 = wordSplit pol1 
-    p2 = wordSplit pol2
+multiplyPolynoms pol1 pol2 = Polynom [multiplyTerms t1 t2 | t1 <- p1, t2 <- p2]
+  where
+    p1 = extractListOfTerms $ wordSplit pol1
+    p2 = extractListOfTerms $ wordSplit pol2
 
 {-
 Função auxiliar do polyToString que cria a string que adiciona a variavel ao expoente.
@@ -142,7 +146,7 @@ Função auxiliar do polyToString que adiciona o coeficiente ao resultado do var
 Por exemplo: termoToString (Termo 3 "xy" [2, 1]) retorna "3.0*x^2*y"
 -}
 termoToString :: Termo -> String
-termoToString ter 
+termoToString ter
             | coef ter == 1 = tail $ variableWithExpo (variable ter) (expo ter)
             | otherwise = show (coef ter) <> variableWithExpo (variable ter) (expo ter)
 
@@ -152,9 +156,9 @@ Função responsável pela conversão da representação interna do polinómio p
 polyToString :: Polynom -> String
 polyToString p
   | length pol == 1 = termoToString (last pol)
-  | head (termoToString (last pol)) == '-' = polyToString (init pol) <> " - " <> tail (termoToString (last pol))
-  | otherwise = polyToString (init pol) <> " + " <> termoToString (last pol)
-  where pol = normalize $ polyToString (map organize p)
+  | head (termoToString (last pol)) == '-' = polyToString (Polynom $ init pol) <> " - " <> tail (termoToString (last pol))
+  | otherwise = polyToString (Polynom $ init pol) <> " + " <> termoToString (last pol)
+  where pol = extractListOfTerms $ normalize $ polyToString (Polynom $ map organize (extractListOfTerms p))
 
 
 {-
@@ -203,7 +207,7 @@ e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode
 Por exemplo: derivative "2x^2y + 5*x" 'x' retorna [Termo {coef = 5.0, variable = "", expo = []},Termo {coef = 4.0, variable = "xy", expo = [1,1]}]
 -}
 derivative :: String -> Char -> Polynom
-derivative p var = normalize $ polyToString
+derivative p var = normalize $ polyToString $ Polynom
   [ Termo (coef ter * fromIntegral coefmult) fixedvar fixedexp | ter <- pol, let (coefmult, defexpos) = findVar (variable ter) (expo ter) var
                                                                                  (fixedvar, fixedexp) = removeZeroExp (variable ter) defexpos, coefmult /= -1
-  ] where pol = wordSplit p
+  ] where pol = extractListOfTerms $ wordSplit p
