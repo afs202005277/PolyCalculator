@@ -6,16 +6,15 @@
 - [x] exemplos de utilizacao
 - [x] ordenar variaveis -> o programa considera que "2xyz" é diferente de "2yzx"
 - [x] Integrar ordenacao de variaveis com funcoes
-- [x] Escrever relatorio
-- [ ] Comentar codigo
+- [ ] Escrever relatorio - FALTA O findExponents
+- [ ] Comentar codigo - FALTA O findExponents
 - [x] resolver bug: `sumPolynoms [Termo 2 "y" [1], Termo 5.1 "y" [1], Termo 1 "y" [1]]`
 - [x] Aula: perguntar ao stor a questao de o polyToString imprimir plicas com as variaveis
 - [x] Todos os resultados das funcoes deviam estar automaticamente normalizados
-- [ ] Funcoes receberem string e chamarem elas o wordsplit? fazer
+- [x] Funcoes receberem string e chamarem elas o wordsplit? fazer
 - [x] Bug: `wordSplit "2*x^3*y^2 - y + 3"`
 - [x] Adicionar espacos no polyToString para ficar igual ao input do wordsplit
-- [ ] Completar relatorio com a derivada
-- [ ] Atualizar relatorio com nova funcao sumPolynom
+- [x] Completar relatorio com a derivada
 - [ ] TESTAR TUDO E MAIS ALGUMA COISA
 
 ### Representação interna dos polinómios:
@@ -48,20 +47,50 @@ Recebe uma string correspondente a 1 termo e faz parse da mesma de forma a obter
 Exemplo: `termoFactory "-2*x^3*y^2"`
 
 ```haskell
+variableWithExpo :: String -> [Int] -> String
+```
+Função auxiliar do polyToString que cria a string que adiciona a variavel ao expoente.
+Por exemplo: variableWithExpo "xy" [2, 1] retorna "x^2*y"
+
+Exemplo: `variableWithExpo "xy" [2, 1]`
+
+```haskell
+termoToString :: Termo -> String
+```
+Função auxiliar do polyToString que adiciona o coeficiente ao resultado do variableWithExpo. Com a exceção de quando o coeficiente é 1.
+Por exemplo: termoToString (Termo 3 "xy" [2, 1]) retorna "3.0*x^2*y"
+
+Exemplo: `termoToString (Termo 3 "xy" [2, 1])`
+
+```haskell
 polyToString :: Polynom -> String
 ```
 Função responsável pela conversão da representação interna do polinómio para uma string percetível pelo utilizador.
 
 Exemplo: `polyToString $ wordSplit "2*x^3*y^2 - 5*y + 3"`
 
+```haskell
+sortGT :: (Ord a1, Ord a2) => (a1, a2) -> (a1, a2) -> Ordering
+```
+Função auxiliar do organize que ordena por ordem crescente as variáveis com os seus respetivos expoentes.
+
+Exemplo: `sortGT ("x", 2) ("y", 3)`
+
+```haskell
+organize :: Termo -> Termo
+```
+Função responsável por organizar as variáveis dentro dos termos por ordem alfabetica. Necessário para o programa não achar que "xy" é diferente de "yx"
+
+Exemplo: `organize $ Termo 3 "zyx" [3, 2, 1]`
+
 #### Normalização de polinómios:
 Função usada:
 ```haskell
-normalize :: Polynom -> Polynom
+normalize :: String -> Polynom
 ```
-Esta função recebe um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. Para a ordenação, definimos um overload da classe Ord.
+Esta função recebe um string de um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. Para a ordenação, definimos um overload da classe Ord.
 
-Exemplo: `normalize  [Termo 0 "x" [2], Termo 2 "y" [1], Termo 5.1 "z" [1], Termo 1 "y" [1], Termo 7 "y" [2]]`
+Exemplo: `normalize "0*x + 5*y + 3*y"`
 
 #### Soma de polinómios:
 Funções usadas:
@@ -90,21 +119,21 @@ Recebe uma lista de termos que podem ser somados e soma-os recursivamente, devol
 Exemplo: `sumMatchingTerms [Termo 2 "y" [1], Termo 1 "y" [1], Termo 5 "y" [1]]`
 
 ```haskell
-sumPolynoms :: Polynom -> Polynom
+sumPolynoms :: [String] -> Polynom
 ```
-Esta é a função principal desta funcionalidade. Recebe uma lista de termos (polinómio) e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
+Esta é a função principal desta funcionalidade. Recebe uma polinómio no formato de string e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
 
-Exemplo: `sumPolynoms [Termo 0 "x" [2], Termo 2 "y" [1], Termo 5.1 "z" [1], Termo 1 "y" [1], Termo 7 "y" [2], Termo 2 "y" [1]]`
+Exemplo: `sumPolynoms ["2*x + 5*y", "8*x + 2*y"]`
 
 #### Multiplicação de polinómios:
 Funções usadas:
 
 ```haskell
-multiplyPolynoms :: Polynom -> Polynom -> Polynom
+multiplyPolynoms :: String -> String -> Polynom
 ```
-Esta é a função principal desta funcionalidade. Recebe dois polinómios e devolve o resultado da multiplicação dos dois, recorrendo a uma lista em compreensão e à função multiplyTerms que está explicada abaixo.
+Esta é a função principal desta funcionalidade. Recebe dois polinómios no formato de string e devolve o resultado da multiplicação dos dois, recorrendo a uma lista em compreensão e à função multiplyTerms que está explicada abaixo.
 
-Exemplo (propriedade distributiva): `multiplyPolynoms [Termo 1 "a" [1], Termo 1 "b" [1]] [Termo 1 "c" [1], Termo 1 "d" [1]]`
+Exemplo (propriedade distributiva): `multiplyPolynoms "2*x + 5*y" "6*y + 9*x"`
 
 ```haskell
 multiplyTerms :: Termo -> Termo -> Termo
@@ -133,3 +162,33 @@ Exemplo: `collapseExponents "xyyzzz"`
 Ideia geral da multiplicação: multiplicam-se os coeficientes, expande-se os expoentes de cada termo (função expandExponents) e concatena-se a expansão resultante. No final, remove-se os duplicados (obtendo assim a lista de variáveis final) e recalcula-se os expoentes (função collapseExponents).
 
 #### Derivada de um polinómio:
+Funções usadas:
+
+Ideia geral da derivação: procura-se os expoentes da variável que se pretende derivar (findVar), multiplica-se o coeficiente por esse valor e decrementa-se o valor dos expoentes dessa variável. No caso do expoente ficar a zero, a variável é retirada (removeZeroExp).
+
+```haskell
+derivative :: String -> Char -> Polynom
+```
+
+Esta é a função principal. Recebe um polinómio no formato de string e uma variável a derivar e usa a função findVar (para encontrar o atual expoente da variável e arranjar os expoentes da derivada) e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode ter ido para zero) para efetuar a derivada da variável dada.
+Por exemplo: derivative "2*x^2*y + 5*x" 'x' retorna [Termo {coef = 5.0, variable = "", expo = []},Termo {coef = 4.0, variable = "xy", expo = [1,1]}]
+
+Exemplo: `derivative "2*x^2*y + 5*x" 'x'`
+
+```haskell
+removeZeroExp :: String -> [Int] -> (String, [Int])
+```
+
+Esta função trata de remover as variáveis que têm expoente zero, Ou seja, se tivermos um termo com x^0 = 1, esta variável é removida.
+Por exemplo: removeZeroExp "xyz" [3,0,2] retorna ("xz", [3,2])
+
+Exemplo: `removeZeroExp "xyz" [3,0,2]`
+
+```haskell
+findVar :: String -> [Int] -> Char -> (Int, [Int])
+```
+
+Esta função trata de descobrir o expoente da variável dada e devolve a lista de expoentes atualizada após uma derivação em ordem à variável dada.
+Por exemplo: findVar "xyz" [3, 2, 3] 'x' retorna (3, [2, 2, 3])
+
+Exemplo: `findVar "xyz" [3, 2, 3] 'x'`
