@@ -6,8 +6,8 @@
 - [x] exemplos de utilizacao
 - [x] ordenar variaveis -> o programa considera que "2xyz" é diferente de "2yzx"
 - [x] Integrar ordenacao de variaveis com funcoes
-- [ ] Escrever relatorio - FALTA O findExponents
-- [ ] Comentar codigo - FALTA O findExponents
+- [x] Escrever relatorio - FALTA O findExponents
+- [x] Comentar codigo - FALTA O findExponents
 - [x] resolver bug: `sumPolynoms [Termo 2 "y" [1], Termo 5.1 "y" [1], Termo 1 "y" [1]]`
 - [x] Aula: perguntar ao stor a questao de o polyToString imprimir plicas com as variaveis
 - [x] Todos os resultados das funcoes deviam estar automaticamente normalizados
@@ -42,9 +42,16 @@ Exemplo: `wordSplit "2*x^3*y^2 - 5*y + 3"`
 ```haskell
 termoFactory :: String -> Termo
 ```
-Recebe uma string correspondente a 1 termo e faz parse da mesma de forma a obter o valor do coeficiente, das variáveis usadas e dos expoentes de cada variável.
+Função auxiliar da função wordSplit que recebe uma string correspondente a 1 termo e faz parse da mesma de forma a obter o valor do coeficiente, das variáveis usadas e dos expoentes de cada variável.
 
 Exemplo: `termoFactory "-2*x^3*y^2"`
+
+```haskell
+findExponents :: String -> [Int]
+```
+Função auxiliar usada pela função termoFactory que recebe uma string que contém apenas as variáveis e os expoentes das mesmas e devolve os expoentes de cada variável.
+
+Exemplo: `findExponents "x2y3"`
 
 ```haskell
 variableWithExpo :: String -> [Int] -> String

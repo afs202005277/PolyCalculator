@@ -21,6 +21,9 @@ instance Ord Termo where
     | variable t1 == variable t2 && expo t1 == expo t2 = EQ
     | otherwise = GT
 
+{-
+Esta função apenas extrai o valor da lista contida internamente no tipo de dados "Polynom"
+-}
 extractListOfTerms :: Polynom -> [Termo]
 extractListOfTerms (Polynom lst) = lst
 
@@ -46,7 +49,9 @@ grouping :: Polynom -> [[Termo]]
 grouping (Polynom []) = []
 grouping (Polynom (x : xs)) = filter (isSummable x) (x : xs) : grouping (Polynom $ filter (not . isSummable x) xs)
 
-
+{-
+Esta função recebe uma string e extrai os valores dos expoentes associados a cada variável.
+-}
 findExponents :: String -> [Int]
 findExponents [] = []
 findExponents [a] = [1]
