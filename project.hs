@@ -5,7 +5,6 @@ import Data.Maybe
 import Text.Read (readMaybe)
 
 
-
 -- 1 polinómio é representado por uma lista de termos, sendo que, cada termo é composto por um coeficiente de vírgula flutuante, uma lista de variáveis e uma lista de expoentes.
 -- A associação entre as variáveis e os expoentes é feita recorrendo aos indíces de cada um, ou seja, o expoente que se encontra no indíce 2 é o expoente da variável no indíce 2 da respetiva lista.
 data Polynom = Polynom [Termo]

@@ -21,8 +21,8 @@
 
 Na resolução deste projeto, usamos a seguinte representação interna de polinómios:
 ```haskell
-type Polynom = [Termo]
-data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]}
+data Polynom = Polynom [Termo]
+data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq, Show)
 ```
 Ou seja, 1 polinómio é representado por uma lista de termos, sendo que, cada termo é composto por um coeficiente de vírgula flutuante, uma lista de variáveis e uma lista de expoentes. A associação entre as variáveis e os expoentes é feita recorrendo aos indíces de cada um, ou seja, o expoente que se encontra no indíce 2 é o expoente da variável no indíce 2 da respetiva lista. Por exemplo:
 > 2\*y\*z + 5\*x\*z + y + 7\*a\^1\*b\^2\*c^3 é representado por:
@@ -56,7 +56,7 @@ Exemplo: `findExponents "x2y3"`
 ```haskell
 variableWithExpo :: String -> [Int] -> String
 ```
-Função auxiliar do polyToString que cria a string que adiciona a variavel ao expoente.
+Função auxiliar do polyToString que cria a string que adiciona a variável ao expoente.
 Por exemplo: variableWithExpo "xy" [2, 1] retorna "x^2*y"
 
 Exemplo: `variableWithExpo "xy" [2, 1]`
@@ -86,7 +86,7 @@ Exemplo: `sortGT ("x", 2) ("y", 3)`
 ```haskell
 organize :: Termo -> Termo
 ```
-Função responsável por organizar as variáveis dentro dos termos por ordem alfabetica. Necessário para o programa não achar que "xy" é diferente de "yx"
+Função responsável por organizar as variáveis dentro dos termos por ordem alfabética. Necessário para o programa não considerar que "xy" é diferente de "yx"
 
 Exemplo: `organize $ Termo 3 "zyx" [3, 2, 1]`
 
@@ -166,12 +166,12 @@ Por exemplo: collapseExponents "xyyzzz" retorna [1, 2, 3]
 
 Exemplo: `collapseExponents "xyyzzz"`
 
-Ideia geral da multiplicação: multiplicam-se os coeficientes, expande-se os expoentes de cada termo (função expandExponents) e concatena-se a expansão resultante. No final, remove-se os duplicados (obtendo assim a lista de variáveis final) e recalcula-se os expoentes (função collapseExponents).
+Ideia geral da multiplicação: multiplicam-se os coeficientes, expande-se os expoentes de cada termo (função expandExponents) e concatena-se a expansão resultante. No final, recalcula-se os expoentes (função collapseExponents) e remove-se os duplicados (obtendo assim a lista de variáveis final).
 
 #### Derivada de um polinómio:
-Funções usadas:
-
 Ideia geral da derivação: procura-se os expoentes da variável que se pretende derivar (findVar), multiplica-se o coeficiente por esse valor e decrementa-se o valor dos expoentes dessa variável. No caso do expoente ficar a zero, a variável é retirada (removeZeroExp).
+
+Funções usadas:
 
 ```haskell
 derivative :: String -> Char -> Polynom
@@ -186,7 +186,7 @@ Exemplo: `derivative "2*x^2*y + 5*x" 'x'`
 removeZeroExp :: String -> [Int] -> (String, [Int])
 ```
 
-Esta função trata de remover as variáveis que têm expoente zero, Ou seja, se tivermos um termo com x^0 = 1, esta variável é removida.
+Esta função remove as variáveis que têm expoente zero, ou seja, se tivermos um termo com x^0 = 1, esta variável é removida.
 Por exemplo: removeZeroExp "xyz" [3,0,2] retorna ("xz", [3,2])
 
 Exemplo: `removeZeroExp "xyz" [3,0,2]`
@@ -195,7 +195,7 @@ Exemplo: `removeZeroExp "xyz" [3,0,2]`
 findVar :: String -> [Int] -> Char -> (Int, [Int])
 ```
 
-Esta função trata de descobrir o expoente da variável dada e devolve a lista de expoentes atualizada após uma derivação em ordem à variável dada.
+Esta função descobre o expoente da variável dada e devolve a lista de expoentes atualizada após uma derivação em ordem à variável dada.
 Por exemplo: findVar "xyz" [3, 2, 3] 'x' retorna (3, [2, 2, 3])
 
 Exemplo: `findVar "xyz" [3, 2, 3] 'x'`
