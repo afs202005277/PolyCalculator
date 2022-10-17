@@ -88,7 +88,14 @@ Função usada:
 ```haskell
 normalize :: String -> Polynom
 ```
-Esta função recebe um string de um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. Para a ordenação, definimos um overload da classe Ord.
+Esta função recebe como input um string do polinomio, transforma-o no type Polynom (wordSplit) e retorna-o polinómio normalizado.
+
+Exemplo: `normalize "0*x + 5*y + 3*y"`
+
+```haskell
+norm :: Polynom -> Polynom
+```
+Esta função recebe um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. Para a ordenação, definimos um overload da classe Ord.
 
 Exemplo: `normalize "0*x + 5*y + 3*y"`
 
@@ -121,9 +128,16 @@ Exemplo: `sumMatchingTerms [Termo 2 "y" [1], Termo 1 "y" [1], Termo 5 "y" [1]]`
 ```haskell
 sumPolynoms :: [String] -> Polynom
 ```
-Esta é a função principal desta funcionalidade. Recebe uma polinómio no formato de string e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
+Esta é a função principal desta funcionalidade. Recebe um polinómio no formato de string transforma no type Polynom e retorna o resultado da função sump.
 
 Exemplo: `sumPolynoms ["2*x + 5*y", "8*x + 2*y"]`
+
+```haskell
+sump :: [Polynom] -> Polynom
+```
+Recebe uma polinómio e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima. 
+
+Exemplo: `sump [[Termo {coef = 6.0, variable = "x", expo = [2]},Termo {coef = 2.0, variable = "xy", expo = [1,1]}], [Termo {coef = 9.0, variable = "x", expo = [2]},Termo {coef = 8.0, variable = "xy", expo = [1,1]}]]`
 
 #### Multiplicação de polinómios:
 Funções usadas:
