@@ -9,7 +9,7 @@ import Text.Read (readMaybe)
 -- 1 polinómio é representado por uma lista de termos, sendo que, cada termo é composto por um coeficiente de vírgula flutuante, uma lista de variáveis e uma lista de expoentes.
 -- A associação entre as variáveis e os expoentes é feita recorrendo aos indíces de cada um, ou seja, o expoente que se encontra no indíce 2 é o expoente da variável no indíce 2 da respetiva lista.
 data Polynom = Polynom [Termo]
-data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq)
+data Termo = Termo {coef :: Float, variable :: String, expo :: [Int]} deriving (Eq, Show)
 
 instance Show Polynom where
   show poly = polyToString poly
@@ -17,7 +17,7 @@ instance Show Polynom where
 instance Ord Termo where
   compare t1 t2
     | variable t1 < variable t2 = LT
-    | variable t1 == variable t2 && expo t1 < expo t2 = GT
+    | variable t1 == variable t2 && expo t1 < expo t2 = LT
     | variable t1 == variable t2 && expo t1 == expo t2 = EQ
     | otherwise = GT
 
@@ -28,7 +28,7 @@ extractListOfTerms :: Polynom -> [Termo]
 extractListOfTerms (Polynom lst) = lst
 
 {-
-Esta função recebe como input um string do polinomio, transforma-o no type Polynom (wordSplit) e retorna-o polinómio normalizado.
+Esta função recebe como input um string do polinomio, transforma-o no type Polynom (wordSplit) e retorna o polinómio normalizado.
 -}
 normalize :: String -> Polynom
 normalize p = norm $ wordSplit p
@@ -39,7 +39,7 @@ Esta função recebe um polinómio e devolve o polinómio resultante de somar os
   Para a ordenação, definimos um overload da classe Ord.
 -}
 norm :: Polynom -> Polynom
-norm p = Polynom (sort (filter (\x -> coef x /= 0) $ extractListOfTerms (sump [p])))
+norm p = Polynom $ reverse $ sort (filter (\x -> coef x /= 0) $ extractListOfTerms (sump [p]))
 
 {-
 Retorna um booleano que indica se os dois termos podem ser somados ou não, por outras palavras, verifica se os dois termos têm as mesmas variáveis e expoentes.

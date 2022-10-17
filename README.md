@@ -97,7 +97,7 @@ normalize :: String -> Polynom
 ```
 Esta função recebe um string de um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. Para a ordenação, definimos um overload da classe Ord.
 
-Exemplo: `normalize "0*x + 5*y + 3*y"`
+Exemplo: `normalize "3*y^2 + 0*x + 5*y + 3*y + 2*y^2"`
 
 #### Soma de polinómios:
 Funções usadas:
@@ -116,7 +116,7 @@ grouping :: Polynom -> [Polynom]
 ```
 Retorna uma lista de polinómios, ou seja, uma lista de listas de termos sendo que os elementos de cada sublista são elementos que podem ser somados entre si (esta função recorre à função isSummable para agrupar os elementos que podem ser somados).
 
-Exemplo: `grouping [Termo 5 "y" [2], Termo 7 "y" [3], Termo 8 "z" [2], Termo 2 "y" [2]]`
+Exemplo: `grouping $ Polynom ([Termo 5 "y" [2], Termo 7 "y" [3], Termo 8 "z" [2], Termo 2 "y" [2]])`
 
 ```haskell
 sumMatchingTerms :: [Termo] -> Termo
