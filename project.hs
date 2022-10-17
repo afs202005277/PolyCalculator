@@ -28,12 +28,18 @@ extractListOfTerms :: Polynom -> [Termo]
 extractListOfTerms (Polynom lst) = lst
 
 {-
-Esta função recebe um string de um polinómio e devolve o polinómio resultante de somar os seus termos (se possível), 
-remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável. 
-Para a ordenação, definimos um overload da classe Ord.
+Esta função recebe como input um string do polinomio, transforma-o no type Polynom (wordSplit) e retorna-o polinómio normalizado.
 -}
 normalize :: String -> Polynom
-normalize p = Polynom (sort (filter (\x -> coef x /= 0) $ extractListOfTerms (sumPolynoms [p])))
+normalize p = norm $ wordSplit p
+
+{-
+Esta função recebe um polinómio e devolve o polinómio resultante de somar os seus termos (se possível),
+ remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável.
+  Para a ordenação, definimos um overload da classe Ord.
+-}
+norm :: Polynom -> Polynom
+norm p = Polynom (sort (filter (\x -> coef x /= 0) $ extractListOfTerms (sump [p])))
 
 {-
 Retorna um booleano que indica se os dois termos podem ser somados ou não, por outras palavras, verifica se os dois termos têm as mesmas variáveis e expoentes.
@@ -91,10 +97,16 @@ sumMatchingTerms (p1 : p2 : ps) = sumMatchingTerms (recent_term : ps)
     recent_term = Termo (coef p1 + coef p2) (variable p1) (expo p1)
 
 {-
-Esta é a função principal desta funcionalidade. Recebe uma polinómio no formato de string e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima.
+Esta é a função principal desta funcionalidade. Recebe um polinómio no formato de string transforma no type Polynom e retorna o resultado da função sump.
 -}
 sumPolynoms :: [String] -> Polynom
-sumPolynoms p = Polynom $ map sumMatchingTerms (grouping (Polynom (concatMap extractListOfTerms (map wordSplit p))))
+sumPolynoms p = sump $ map wordSplit p
+
+{-
+Recebe uma polinómio e soma todos os termos que forem compatíveis, recorrendo às funções descritas acima.
+-}
+sump :: [Polynom] -> Polynom
+sump p = Polynom $ map sumMatchingTerms (grouping (Polynom (concatMap extractListOfTerms p)))
 
 {-
 Recebe a lista de variáveis e de expoentes de um termo e retorna uma string em que cada variável está repetida n vezes,
@@ -163,7 +175,7 @@ polyToString p
   | length pol == 1 = termoToString (last pol)
   | head (termoToString (last pol)) == '-' = polyToString (Polynom $ init pol) <> " - " <> tail (termoToString (last pol))
   | otherwise = polyToString (Polynom $ init pol) <> " + " <> termoToString (last pol)
-  where pol = extractListOfTerms $ normalize $ polyToString (Polynom $ map organize (extractListOfTerms p))
+  where pol = extractListOfTerms $ norm $ (Polynom $ map organize (extractListOfTerms p))
 
 
 {-
@@ -212,7 +224,7 @@ e removeZeroExp (para remover as variáveis cujo expoente devido a derivada pode
 Por exemplo: derivative "2x^2y + 5*x" 'x' retorna [Termo {coef = 5.0, variable = "", expo = []},Termo {coef = 4.0, variable = "xy", expo = [1,1]}]
 -}
 derivative :: String -> Char -> Polynom
-derivative p var = normalize $ polyToString $ Polynom
+derivative p var = norm $ Polynom
   [ Termo (coef ter * fromIntegral coefmult) fixedvar fixedexp | ter <- pol, let (coefmult, defexpos) = findVar (variable ter) (expo ter) var
                                                                                  (fixedvar, fixedexp) = removeZeroExp (variable ter) defexpos, coefmult /= -1
   ] where pol = extractListOfTerms $ wordSplit p
