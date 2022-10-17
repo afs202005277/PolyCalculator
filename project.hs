@@ -152,7 +152,7 @@ Função auxiliar do polyToString que cria a string que adiciona a variavel ao e
 Por exemplo: variableWithExpo "xy" [2, 1] retorna "x^2*y"
 -}
 variableWithExpo :: String -> [Int] -> String
-variableWithExpo [] [] = ""
+variableWithExpo "" [] = ""
 variableWithExpo var exp
   | head exp == 1 = "*" <> [head var] <> variableWithExpo (tail var) (tail exp)
   | otherwise = "*" <> [head var] <> "^" <> show (head exp) <> variableWithExpo (tail var) (tail exp)
@@ -163,6 +163,7 @@ Por exemplo: termoToString (Termo 3 "xy" [2, 1]) retorna "3.0*x^2*y"
 -}
 termoToString :: Termo -> String
 termoToString ter
+            | variable ter == "" = show (coef ter)
             | coef ter == 1 = tail $ variableWithExpo (variable ter) (expo ter)
             | otherwise = show (coef ter) <> variableWithExpo (variable ter) (expo ter)
 
@@ -171,6 +172,7 @@ Função responsável pela conversão da representação interna do polinómio p
 -}
 polyToString :: Polynom -> String
 polyToString p
+  | length (extractListOfTerms p) == 0 = "0.0"
   | length pol == 1 = termoToString (last pol)
   | head (termoToString (last pol)) == '-' = polyToString (Polynom $ init pol) <> " - " <> tail (termoToString (last pol))
   | otherwise = polyToString (Polynom $ init pol) <> " + " <> termoToString (last pol)
@@ -224,6 +226,4 @@ Por exemplo: derivative "2x^2y + 5*x" 'x' retorna [Termo {coef = 5.0, variable =
 -}
 derivative :: String -> Char -> Polynom
 derivative p var = norm $ Polynom
-  [ Termo (coef ter * fromIntegral coefmult) fixedvar fixedexp | ter <- pol, let (coefmult, defexpos) = findVar (variable ter) (expo ter) var
-                                                                                 (fixedvar, fixedexp) = removeZeroExp (variable ter) defexpos, coefmult /= -1
-  ] where pol = extractListOfTerms $ wordSplit p
+  [ Termo (coef ter * fromIntegral coefmult) fixedvar fixedexp | ter <- pol, let (coefmult, defexpos) = findVar (variable ter) (expo ter) var, coefmult /= -1, let (fixedvar, fixedexp) = removeZeroExp (variable ter) defexpos] where pol = extractListOfTerms $ wordSplit p
