@@ -33,12 +33,12 @@ normalize :: String -> Polynom
 normalize p = norm $ wordSplit p
 
 {-
-Esta função recebe um polinómio e devolve o polinómio resultante de somar os seus termos (se possível),
+Esta função recebe um polinómio e devolve o polinómio resultante de somar os seus termos (se possível) e juntar as variáveis repetidas,
  remover os termos com coeficiente nulo e de ordenar os termos de forma a ficarem por ordem decrescente de expoente e agrupados por variável.
   Para a ordenação, definimos um overload da classe Ord.
 -}
 norm :: Polynom -> Polynom
-norm p = Polynom $ reverse $ sort (filter (\x -> coef x /= 0) $ extractListOfTerms (sump [p]))
+norm p = Polynom $ map joinSameVar (reverse $ sort (filter (\x -> coef x /= 0) $ extractListOfTerms (sump [p])))
 
 {-
 Retorna um booleano que indica se os dois termos podem ser somados ou não, por outras palavras, verifica se os dois termos têm as mesmas variáveis e expoentes.
@@ -66,10 +66,16 @@ findExponents (x : y : xs)
 
 
 {-
+Esta função recebe um Termo e junta as variáveis repetidas.
+-}
+joinSameVar :: Termo -> Termo
+joinSameVar ter = Termo (coef ter) (nub $ variable ter) (collapseExponents ((expandExponents (variable ter) (expo ter))))
+
+{-
 Recebe uma string correspondente a 1 termo e faz parse da mesma de forma a obter o valor do coeficiente, das variáveis usadas e dos expoentes de cada variável.
 -}
 termoFactory :: String -> Termo
-termoFactory str = organize (Termo (fromMaybe 1 attempt_coef) (filter isAlpha str) (findExponents (filter (\x -> isAlpha x || isDigit x) (dropWhile (\x -> (not . isAlpha) x && x /= '*') str))))
+termoFactory str = organize (joinSameVar (Termo (fromMaybe 1 attempt_coef) (filter isAlpha str) (findExponents (filter (\x -> isAlpha x || isDigit x) (dropWhile (\x -> (not . isAlpha) x && x /= '*') str)))))
   where
     attempt_coef = readMaybe (if length coef_component == 1 && head coef_component == '-' then "-1" else coef_component) :: Maybe Float
     coef_component = takeWhile (\x -> (not . isAlpha) x && x /= '*') str
