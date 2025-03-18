@@ -1,4 +1,4 @@
-# PFL_Project1
+# PolyCalculator
 
 ## Overview
 
